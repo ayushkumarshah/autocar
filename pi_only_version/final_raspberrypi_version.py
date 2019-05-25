@@ -4,8 +4,6 @@ import matplotlib.image as mpimg
 import numpy as np
 import cv2
 import math
-import control
-import ultrasonic
 #import serial
 
 
@@ -193,26 +191,10 @@ def pipeline(image):
     return line_image
 
 
-cap = cv2.VideoCapture(1)
+cap = cv2.VideoCapture(0)
 
 
 while 1:
-
-    dist = round(ultrasonic.distance(),2)
-    print ("Measured Distance = %.1f cm" % dist)
-    #time.sleep(1)
-    control.driveFORWARD()
-    if (dist<50):
-	control.applyBRAKE()
-    #applyBRAKE()
-    #driveFORWARD()
-    #driveREVERSE()
-    #forwardLEFT()
-    #forwardRIGHT()
-    #reverseLEFT()
-    #reverseRIGHT()
-    #sleep(4)
-
     ret, image = cap.read()
     gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
     line_image=pipeline(image)
@@ -220,21 +202,19 @@ while 1:
     stops = stop_cascade.detectMultiScale(gray, 1.3, 5)
     traffics = traffic_cascade.detectMultiScale(gray, 1.3, 5)
 
-
-    if dist:
-	print dist
-	cv2.putText(line_image, str(dist)+"cm", (473,23), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 255), 2)
+    #data=serial_port.readline()
+    if data:
+	#print data
+	cv2.putText(line_image, data, (400,23), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 255), 2)
 
     #print stops;
     if (stops!=()):
         #serial_port.write(chr(0))
-        control.applyBRAKE()
-	control.time.sleep(2)
         print("Stop")
     '''else:
 	#serial_port.write(chr(1))
         print("Go")
-    '''
+'''
 
     for (x,y,w,h) in stops:
         #print ("stopppp")
@@ -266,14 +246,14 @@ while 1:
                     # Red light
             if 1.0/8*(height-30) < maxLoc[1] < 4.0/8*(height-30):
                 cv2.putText(line_image, 'Red', (x_pos+5, y_pos-5), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 255), 2)
-                control.applyBRAKE()
-		control.time.sleep(2)
-		#self.traffic_cascade.red_light = True
+		#serial_port.write(chr(0))
+                #self.traffic_cascade.red_light = True
                     
                     # Green light
             elif 5.9/8*(height-30) < maxLoc[1] < height-30:
                 cv2.putText(line_image, 'Green', (x_pos+5, y_pos - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 0), 2)
                 #self.traffic_cascade.green_light = True
+		#serial_port.write(chr(0))
     
                     # yellow light
                     #elif 4.0/8*(height-30) < maxLoc[1] < 5.5/8*(height-30):
